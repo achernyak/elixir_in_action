@@ -27,4 +27,15 @@ defmodule EnumStreams do
       line2
     end
   end
+
+  def words_per_line!(path) do
+    filtered_lines!(path)
+    |> Enum.map(&word_count/1)
+  end
+
+  defp word_count(string) do
+    string
+    |> String.split(" ")
+    |> length
+  end
 end
