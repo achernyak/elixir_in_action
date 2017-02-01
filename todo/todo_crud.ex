@@ -45,4 +45,11 @@ defmodule TodoList do
   def update_entry(todo_list, %{} = new_entry) do
     update_entry(todo_list, new_entry.id, fn(_) -> new_entry end)
   end
+
+  def delete_entry(
+    %TodoList{entries: entries} = todo_list,
+    entry_id
+  ) do
+    %TodoList{todo_list | entries: HashDisc.delete(entries, entry_id)}
+  end
 end
