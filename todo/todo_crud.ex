@@ -74,30 +74,43 @@ defmodule TodoList.CsvImporter do
     |> Stream.map(&String.replace(&1, "\n", ""))
   end
 
-  def create_entries(lines) do
+  defp create_entries(lines) do
     lines
     |> Stream.map(&extract_fields/1)
     |> Stream.map(&create_entry/1)
   end
 
-  def extract_fields(line) do
+  defp extract_fields(line) do
     line
     |> String.split(",")
     |> convert_date
   end
 
-  def convert_date([date_string, title]) do
+  defp convert_date([date_string, title]) do
     {parse_date(date_string), title}
   end
 
-  def parse_date(date_string) do
+  defp parse_date(date_string) do
     date_string
     |> String.split("/")
     |> Enum.map(&String.to_integer/1)
     |> List.to_tuple
   end
 
-  def create_entry({date, title}) do
+  defp create_entry({date, title}) do
     %{date: date, title: title}
   end
+end
+
+defimpl Collectable, for: TodoList do
+  def into(original) do
+    {original, &into_callback/2}
+  end
+
+  defp into_callback(todo_list, {:cont, entry}) do
+    TodoList.add_entry(todo_list, entry)
+  end
+
+  defp into_callback(todo_list, :done), do: todo_list
+  defp into_callback(_, :halt), do: :ok
 end
