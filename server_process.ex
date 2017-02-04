@@ -30,6 +30,10 @@ defmodule ServerProcess do
 end
 
 defmodule KeyValueStore do
+  def start do
+    ServerProcess.start(KeyValueStore)
+  end
+  
   def init do
     HashDict.new
   end
