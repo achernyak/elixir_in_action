@@ -26,16 +26,19 @@ defmodule Todo.Server do
 
   def handle_cast({:add_entry, new_entry}, {name, todo_list}) do
     new_state = Todo.List.add_entry(todo_list, new_entry)
+    Todo.Database.store(name, new_state)
     {:noreply, {name,  new_state}}
   end
 
   def handle_cast({:update_entry, new_entry}, {name, todo_list}) do
     new_state = Todo.List.update_entry(todo_list, new_entry)
+    Todo.Database.store(name, new_state)
     {:noreply, {name, new_state}}
   end
 
   def handle_cast({:delete_entry, entry_id}, {name, todo_list}) do
     new_state = Todo.List.delete_entry(todo_list, entry_id)
+    Todo.Database.store(name, new_state)
     {:noreply, {name, new_state}}
   end
 
@@ -48,5 +51,5 @@ defmodule Todo.Server do
   end
 
   def handle_info(:stop, state), do: {:stop, :normal, state}
-  def handle_info(_, state), do {:noreply, state}
+  def handle_info(_, state), do: {:noreply, state}
 end
