@@ -18,6 +18,11 @@ defmodule Todo.DatabaseWorker do
     GenServer.call(via_tuple(worker_id), {:get, key})
   end
 
+  defp via_tuple(worker_id) do
+    {:via, Todo.ProcessRegistry, {:database_worker, worker_id}}
+  end
+  
+
   def init(db_folder) do
     File.mkdir_p(db_folder)
     {:ok, db_folder}
@@ -26,6 +31,8 @@ defmodule Todo.DatabaseWorker do
   def handle_cast({:store, key, data}, db_folder) do
     file_name(db_folder, key)
     |> File.write!(:erlang.term_to_binary(data))
+
+    {:noreply, db_folder}
   end
 
   def handle_call({:get, key}, _, db_folder) do
@@ -41,8 +48,4 @@ defmodule Todo.DatabaseWorker do
   def handle_infor(_, state), do: {:noreply, state}
 
   defp file_name(db_folder, key), do: "#{db_folder}/#{key}"
-  
-  defp via_tuple(worker_id) do
-    {:via, Todo.ProcessRegistry, {:database_worker, worker_id}}
-  end
 end

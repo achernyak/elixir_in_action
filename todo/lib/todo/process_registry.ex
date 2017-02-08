@@ -16,7 +16,7 @@ defmodule Todo.ProcessRegistry do
   end
 
   def unregister_name(key) do
-    GenServer.call(:rocess_registry, {:unregister_name, key})
+    GenServer.call(:process_registry, {:unregister_name, key})
   end
 
   def send(key, message) do
@@ -31,8 +31,9 @@ defmodule Todo.ProcessRegistry do
   def init(_) do
     {:ok, HashDict.new}
   end
+  
 
-  def handl_call({:register_name, key, pid}, _, process_registry) do
+  def handle_call({:register_name, key, pid}, _, process_registry) do
     case HashDict.get(process_registry, key) do
       nil ->
 	Process.monitor(pid)
