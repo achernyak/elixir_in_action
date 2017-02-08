@@ -22,4 +22,21 @@ defmodule Todo.ProcessRegistry do
       process_registry
     }
   end
+
+  def handle_info({:DOWN, _, :process, pid, _}, process_registry) do
+    {:noreply, deregister_pid(process_registry, pid)}
+  end
+
+  defp deregister_pid(process_registry, pid) do
+    Enum.reduce(
+      process_registry,
+      process_registry,
+      fn
+	({registered_alias, registered_process}, registry_acc) when registered_process == pid ->
+	  HashDict.delete(registry_acc, registered_alias)
+
+	(_, registry_acc) -> registry_acc
+      end
+    )
+  end
 end
