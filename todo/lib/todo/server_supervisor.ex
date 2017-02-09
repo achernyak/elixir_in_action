@@ -2,7 +2,7 @@ defmodule Todo.ServerSupervisor do
   use Supervisor
 
   def start_link do
-    Supervisor.start_lin(__MODULE__, nil,
+    Supervisor.start_link(__MODULE__, nil,
       name: :todo_server_supervisor
     )
   end
@@ -16,7 +16,7 @@ defmodule Todo.ServerSupervisor do
 
   def init(_) do
     supervise(
-      [worker(Todo.Server, [])]
+      [worker(Todo.Server, [])],
       strategy: :simple_one_for_one
     )
   end
