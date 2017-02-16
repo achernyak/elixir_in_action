@@ -30,7 +30,10 @@ defmodule Todo.Mixfile do
   defp deps do
     [
       {:gproc, "0.3.1"},
-      {:meck, "0.8.2", only: :test}
+      {:cowboy, "1.1.0"},
+      {:plug, "1.3.0"},
+      {:meck, "0.8.2", only: :test},
+      {:httpoison, "0.4.3", only: :test}
     ]
   end
 end
