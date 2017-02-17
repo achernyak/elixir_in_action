@@ -4,6 +4,40 @@ defmodule Todo.Web do
   plug :match
   plug :dispatch
 
+  def start_server do
+    Plug.Adapters.Cowboy.http(__MODULE__, nil, port: 5454)
+  end
+
+  get "/entries" do
+    conn
+    |> Plug.Conn.fetch_query_params
+    |> fetch_entries
+    |> respond
+  end
+
+  defp fetch_entries(conn) do
+    Plug.Conn.assign(
+      conn,
+      :response,
+      entries(conn.params["list"], parse_date(conn.params["date"]))
+    )
+  end
+
+  defp entries(list_name, date) do
+    list_name
+    |> Todo.Cache.server_process
+    |> Todo.Server.entries(date)
+    |> format_entries
+  end
+
+  defp format_entries(entries) do
+    for entry <- entries do
+      {y,m,d} = entry.date
+      "#{y}-#{m}-#{d}    #{entry.title}"
+    end
+    |> Enum.join("\n")
+  end
+  
   post "/add_entry" do
     conn
     |> Plug.Conn.fetch_query_params
@@ -21,10 +55,6 @@ defmodule Todo.Web do
       }
     )
     Plug.Conn.assign(conn, :response, "OK")
-  end
-
-  def start_server do
-    Plug.Adapters.Cowboy.http(__MODULE__, nil, port: 5454)
   end
 
   defp parse_date(
